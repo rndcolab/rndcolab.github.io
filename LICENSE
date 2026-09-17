@@ -1,0 +1,48 @@
+R&D Colab — Website Content
+Copyright (c) 2026 R&D Colab. All rights reserved.
+
+PROPRIETARY — ALL RIGHTS RESERVED, SUBJECT TO THE GITHUB GRANT BELOW
+
+This repository is public because GitHub Pages serves it. Publication is not
+dedication to the public domain and grants no licence beyond the following.
+
+1. THE GITHUB FORK GRANT (already given, not revocable once exercised)
+
+   By hosting this repository publicly on GitHub, R&D Colab has granted other
+   GitHub users the licence described in the GitHub Terms of Service §D.5:
+   a nonexclusive, worldwide licence to view, use, display, perform and
+   reproduce this content BY FORKING IT ON GITHUB. Per those Terms, that
+   licence survives removal of this repository for anyone who has already
+   forked it.
+
+   This file does not purport to withdraw that grant, because it cannot.
+
+2. NO OTHER RIGHTS ARE GRANTED
+
+   Outside the GitHub grant above, no licence is given to copy, reproduce,
+   modify, republish, mirror, redistribute, or make commercial use of this
+   content, including the text, design, layout, imagery and source of this
+   site.
+
+3. TRADE MARKS ARE NOT COVERED BY THE GITHUB GRANT
+
+   "R&D Colab", "AuraGIS", and the associated names, logos and marks are the
+   property of R&D Colab. The GitHub grant in §1 is a copyright licence and
+   conveys no trade mark rights. Forking this repository does not permit use
+   of these marks, and they may not be used in any way that suggests
+   endorsement by or affiliation with R&D Colab.
+
+4. THIRD-PARTY COMPONENTS
+
+   Any third-party assets used by this site retain their own licences.
+
+--------------------------------------------------------------------------
+NOTE ON SCOPE
+
+Nothing proprietary to the AuraGIS product belongs in this repository. It
+holds public marketing content only. Product source, specifications, pricing
+models and internal documents live in private repositories under ADR-018.
+
+This is a rights reservation, not a drafted agreement. See
+decisions/adr-018-licensing-posture.md in the auragis repository.
+--------------------------------------------------------------------------
