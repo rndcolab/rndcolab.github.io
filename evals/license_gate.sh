@@ -34,6 +34,12 @@ while IFS= read -r m; do
   if grep -q '^\[package\]' "$m"; then
     grep -Eq '^[[:space:]]*publish[[:space:]]*=[[:space:]]*false' "$m" \
       || bad "$m has [package] but no 'publish = false'"
+    # ADR-018 §2: `license` is *replaced by* `license-file`, not merely
+    # emptied. Silence is not a proprietary declaration — a manifest that
+    # says nothing reads as unlicensed-by-oversight, which is the state
+    # three of these were in when the gate first passed them clean.
+    grep -Eq '^[[:space:]]*license-file[[:space:]]*=' "$m" \
+      || bad "$m has [package] but no 'license-file' (ADR-018 §2)"
   fi
 done < <(find_pruned Cargo.toml)
 
@@ -41,6 +47,10 @@ while IFS= read -r m; do
   [ -z "$m" ] && continue
   grep -Eq 'license[[:space:]]*=.*("|'"'"')('"$OSI"')' "$m" \
     && bad "$m declares an OSI licence for our own code"
+  if grep -q '^\[project\]' "$m"; then
+    grep -Eq '^[[:space:]]*license[[:space:]]*=' "$m" \
+      || bad "$m has [project] but declares no licence (ADR-018 §2)"
+  fi
 done < <(find_pruned pyproject.toml)
 
 while IFS= read -r m; do
@@ -49,6 +59,8 @@ while IFS= read -r m; do
     || bad "$m is missing \"private\": true"
   grep -Eq '"license"[[:space:]]*:[[:space:]]*"('"$OSI"')"' "$m" \
     && bad "$m declares an OSI licence for our own code"
+  grep -Eq '"license"[[:space:]]*:' "$m" \
+    || bad "$m declares no \"license\" (ADR-018 §2; use \"UNLICENSED\")"
 done < <(find_pruned package.json)
 
 if [ -f "$ROOT/LICENSE" ]; then
@@ -61,7 +73,25 @@ fi
 if [ -d "$ROOT/.github/workflows" ]; then
   while IFS= read -r w; do
     [ -z "$w" ] && continue
-    grep -Eq 'cargo publish|twine upload|npm publish|pypa/gh-action-pypi' "$w" \
+    # maturin is the build backend for BOTH Python packages, so `maturin
+    # publish`/`maturin upload` is the single most likely route to an
+    # accidental PyPI release — and it was the one command this pattern
+    # could not see. ADR-018's whole argument is that the decision stops
+    # being reversible at the first publish.
+    #
+    # **Whole-line comments are stripped before the grep (2026-09-27).** The
+    # distinction is use versus mention — the same one that governs ADR-015's
+    # `.aura` grep and the citation check's `_HISTORICAL` exclusion. A workflow
+    # that *names* `npm publish` in a comment explaining this very gate is not a
+    # workflow that runs it, and on this gate's first real run in `auragis` that
+    # is exactly what it caught: a comment I had just written describing what
+    # check 2 looks for. A false positive, reported as one.
+    #
+    # Only whole-line comments go. A trailing comment cannot launder a real
+    # command, so `npm publish  # disabled` still fails, which is correct: the
+    # line still runs.
+    sed 's/^[[:space:]]*#.*$//' "$w" \
+      | grep -Eq 'cargo publish|twine upload|npm publish|pypa/gh-action-pypi|maturin publish|maturin upload' \
       && bad "$w publishes to a public registry"
   done < <(find "$ROOT/.github/workflows" \( -name '*.yml' -o -name '*.yaml' \) -print 2>/dev/null)
 fi
